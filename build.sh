@@ -718,6 +718,21 @@ elif [ -n "${LTO}" ]; then
   exit 1
 fi
 
+if [ "${DISABLE_32BIT}" = "1" ]; then
+  echo "====================================================="
+  echo "Disabling 32-bit ABI"
+
+  set -x
+  ${KERNEL_DIR}/scripts/config --file ${OUT_DIR}/.config \
+      -d COMPAT \
+      -d COMPAT_32BIT_TIME \
+      --set-val DEFAULT_MMAP_MIN_ADDR 65536 \
+      --set-val LSM_MMAP_MIN_ADDR 65536
+
+      (cd ${OUT_DIR} && make ${TOOL_ARGS} O=${OUT_DIR} "${MAKE_ARGS[@]}" olddefconfig)
+      set +x
+fi
+
 if [ -n "${TAGS_CONFIG}" ]; then
   echo "========================================================"
   echo " Running tags command:"
